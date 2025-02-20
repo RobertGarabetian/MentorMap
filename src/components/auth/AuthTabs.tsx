@@ -4,7 +4,7 @@ import { SignupForm } from "./signup-form";
 
 export function AuthTabs() {
   return (
-    <Tabs defaultValue="signup" className="w-1/2 ">
+    <Tabs defaultValue="signup" className="w-2/3 ">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="signup">Sign Up</TabsTrigger>
         <TabsTrigger value="login">Log In</TabsTrigger>
