@@ -21,27 +21,47 @@ export async function login(formData: FormData) {
     redirect('/error')
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/')
+  revalidatePath('/home', 'layout')
+  redirect('/home')
 }
 
+
+
 export async function signup(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-    name: formData.get('name') as string,
+  // Extract and validate your form inputs
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+  
+  // Sign up the user in Supabase Auth
+  const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
+  if (authError) {
+    console.log(authError);
+    throw authError;
   }
-
-  const { error } = await supabase.auth.signUp(data)
-
-  if (error) {
-    console.log(error)
+  
+  // Extract the user ID from the auth data
+  const userId = authData.user?.id;
+  if (!userId) {
+    throw new Error('User sign up did not return a user ID');
   }
+  
+  // Prepare profile data using the returned user ID
+  const profileData = {
+    user_id: userId,
+    community_college: formData.get('communityCollege') as string,
+    college_major: formData.get('major') as string,
+  };
 
-  revalidatePath('/', 'layout')
-  redirect('/')
+  // Insert the profile data into your 'profiles' table
+  const { error: profileError } = await supabase.from('profiles').insert(profileData);
+  if (profileError) {
+    console.log(profileError);
+    throw profileError;
+  }
+  
+  // Optionally, revalidate or redirect as needed
+  revalidatePath('/home', 'layout');
+  redirect('/home');
 }
