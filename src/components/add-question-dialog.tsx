@@ -15,6 +15,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { type User } from "@supabase/supabase-js";
+import { createClient } from "@/utils/supabase/client";
+import { useEffect } from "react";
 
 const tags = [
   { value: "Transfer Essays", label: "Transfer Essays" },
@@ -23,16 +26,69 @@ const tags = [
   { value: "Transfer Classes", label: "Transfer Classes" },
 ];
 
-export function QuestionDialog() {
+export function QuestionDialog({ user }: { user: User | null }) {
+  const supabase = createClient();
   const [open, setOpen] = React.useState(false);
   const [title, setTitle] = React.useState("");
   const [question, setQuestion] = React.useState("");
+  const [uuid, setUuid] = React.useState("");
   const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
+  const [username, setUsername] = React.useState(true);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const getProfile = React.useCallback(async () => {
+    try {
+      const {
+        data: profileData,
+        error: profileError,
+        status,
+      } = await supabase
+        .from("profiles")
+        .select("user_id, username")
+        .eq("user_id", user?.id)
+        .single();
+
+      if (profileError && status !== 406) {
+        console.log(profileError);
+        throw profileError;
+      }
+
+      if (profileData) {
+        setUuid(profileData.user_id);
+        setUsername(profileData.username);
+      }
+    } catch (error) {
+      alert("Error loading user data!");
+      console.log(error);
+    } finally {
+    }
+  }, [user, supabase]);
+
+  useEffect(() => {
+    getProfile();
+  }, [user, getProfile]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission here
     console.log({ title, question, selectedTags });
+    try {
+      const { error } = await supabase.from("questions").insert({
+        user_id: uuid,
+        username: username,
+        title: title,
+        question: question,
+        tag1: selectedTags[0],
+        tag2: selectedTags[1],
+        tag3: selectedTags[2],
+      });
+      if (error) throw error;
+      alert("Question uploaded to database");
+    } catch (error) {
+      alert("Error updating the data!");
+      console.log(error);
+    } finally {
+    }
+
     setOpen(false);
   };
 

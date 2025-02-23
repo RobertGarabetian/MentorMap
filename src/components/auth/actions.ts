@@ -52,6 +52,7 @@ export async function signup(formData: FormData) {
     user_id: userId,
     community_college: formData.get('communityCollege') as string,
     college_major: formData.get('major') as string,
+    username: formData.get('username') as string,
   };
 
   // Insert the profile data into your 'profiles' table

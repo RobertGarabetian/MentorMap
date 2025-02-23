@@ -22,32 +22,25 @@ import { QuestionDialog } from "@/components/add-question-dialog";
 export default async function PrivatePage() {
   const supabase = await createClient();
 
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-  if (authError || !authData?.user) {
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+  if (authError) {
     redirect("/");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { data: profileData, error: profileError } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("user_id", authData.user.id)
-    .single();
+  // const { data: profileData, error: profileError } = await supabase
+  //   .from("profiles")
+  //   .select("*")
+  //   .eq("user_id", authData.user.id)
+  //   .single();
 
-  if (profileError) {
-    console.error("Error fetching profile:", profileError);
-  }
+  // if (profileError) {
+  //   console.error("Error fetching profile:", profileError);
+  // }
 
   return (
-    // <div className="flex flex-col">
-    //   {/* <p>Hello {authData.user.email}</p>
-    //   {profileData && (
-    //     <div>
-    //       <p>Community College: {profileData.community_college}</p>
-    //       <p>Major: {profileData.college_major}</p>
-    //     </div>
-    //   )} */}
-    // </div>
     <main className="container mx-auto p-4 max-w-4xl">
       {/* Header Section */}
       <div className="text-center mb-8 mt-4">
@@ -61,7 +54,7 @@ export default async function PrivatePage() {
           <PlusCircle className="w-5 h-5" />
           Ask a Question
         </Button> */}
-        <QuestionDialog />
+        <QuestionDialog user={user} />
       </div>
 
       {/* Filter Section */}
