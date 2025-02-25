@@ -30,16 +30,6 @@ export default async function PrivatePage() {
     redirect("/");
   }
 
-  // const { data: profileData, error: profileError } = await supabase
-  //   .from("profiles")
-  //   .select("*")
-  //   .eq("user_id", authData.user.id)
-  //   .single();
-
-  // if (profileError) {
-  //   console.error("Error fetching profile:", profileError);
-  // }
-
   return (
     <main className="container mx-auto p-4 max-w-4xl">
       {/* Header Section */}
@@ -54,6 +44,7 @@ export default async function PrivatePage() {
           <PlusCircle className="w-5 h-5" />
           Ask a Question
         </Button> */}
+        <div>{user?.email}</div>
         <QuestionDialog user={user} />
       </div>
 

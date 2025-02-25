@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { SignOutButton } from "./auth/signout-button";
 
 // Menu items.
 const items = [
@@ -41,7 +42,7 @@ const items = [
   },
 ];
 
-export function AppSidebar() {
+export async function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
@@ -59,6 +60,7 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <SignOutButton />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
