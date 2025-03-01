@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -15,10 +14,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, ThumbsUp } from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
-
 import { QuestionDialog } from "@/components/add-question-dialog";
+
 export default async function PrivatePage() {
   const supabase = await createClient();
 
@@ -26,10 +24,18 @@ export default async function PrivatePage() {
     data: { user },
     error: authError,
   } = await supabase.auth.getUser();
+
   if (authError) {
     redirect("/");
   }
 
+  const { data: posts, error: postError } = await supabase
+    .from("questions")
+    .select("id, username, title, question, tag1, tag2, tag3");
+
+  if (postError) {
+    throw postError;
+  }
   return (
     <main className="container mx-auto p-4 max-w-4xl">
       {/* Header Section */}
@@ -65,7 +71,30 @@ export default async function PrivatePage() {
 
       {/* Questions Feed */}
       <div className="space-y-4">
-        <Card>
+        {posts && posts.length > 0 ? (
+          posts.map((post) => (
+            <Card key={post.id}>
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <CardTitle className="text-xl">{post.title}</CardTitle>
+                    <CardDescription>Posted by {post.username}</CardDescription>
+                  </div>
+
+                  {post.tag1 && <Badge variant="secondary">{post.tag1}</Badge>}
+                  {post.tag2 && <Badge variant="secondary">{post.tag2}</Badge>}
+                  {post.tag3 && <Badge variant="secondary">{post.tag3}</Badge>}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">{post.question}</p>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <p>No questions found.</p>
+        )}
+        {/* <Card>
           <CardHeader>
             <div className="flex items-start justify-between">
               <div className="space-y-1">
@@ -97,70 +126,7 @@ export default async function PrivatePage() {
               </Button>
             </div>
           </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div className="space-y-1">
-                <CardTitle className="text-xl">
-                  Best internships for Business Administration students?
-                </CardTitle>
-                <CardDescription>
-                  Posted by Mike T. • 5 hours ago
-                </CardDescription>
-              </div>
-              <Badge variant="secondary">Career</Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              Looking for summer internship opportunities in the Bay Area. Would
-              love to hear from people who&apos;ve had successful internships
-              while at community college.
-            </p>
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" className="gap-1">
-                <ThumbsUp className="w-4 h-4" />
-                18
-              </Button>
-              <Button variant="ghost" size="sm" className="gap-1">
-                <MessageCircle className="w-4 h-4" />8 Replies
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div className="space-y-1">
-                <CardTitle className="text-xl">
-                  What prerequisites should I take for Psychology?
-                </CardTitle>
-                <CardDescription>Posted by Alex R. • 1 day ago</CardDescription>
-              </div>
-              <Badge variant="secondary">Classes</Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              Planning to major in Psychology and want to make sure I&apos;m
-              taking the right classes. Anyone successfully transferred to a
-              4-year university for Psych?
-            </p>
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" className="gap-1">
-                <ThumbsUp className="w-4 h-4" />
-                31
-              </Button>
-              <Button variant="ghost" size="sm" className="gap-1">
-                <MessageCircle className="w-4 h-4" />
-                15 Replies
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </main>
   );
