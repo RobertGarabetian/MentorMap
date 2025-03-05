@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Tag {
   id: number;
@@ -38,7 +39,7 @@ interface PostsSectionProps {
 
 const PostsSection: React.FC<PostsSectionProps> = ({ tags, posts }) => {
   const [selectedTag, setSelectedTag] = useState("all");
-
+  const router = useRouter();
   const filteredPosts =
     selectedTag === "all"
       ? posts
@@ -78,7 +79,13 @@ const PostsSection: React.FC<PostsSectionProps> = ({ tags, posts }) => {
       <div className="space-y-4">
         {filteredPosts.length > 0 ? (
           filteredPosts.map((post) => (
-            <Card key={post.id}>
+            <Card
+              key={post.id}
+              onClick={() => {
+                router.push(`/home/question/${post.id}`);
+              }}
+              className="hover:border-blue-600"
+            >
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
