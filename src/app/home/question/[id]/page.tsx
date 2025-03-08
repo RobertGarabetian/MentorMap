@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import { Badge } from "@/components/ui/badge";
 import { User } from "lucide-react";
+import ResponseForm from "@/components/response-form";
+import ResponseList from "@/components/response-list";
+import { formatDistanceToNow } from "date-fns";
 
 export default async function QuestionPage({
   params,
@@ -27,6 +30,23 @@ export default async function QuestionPage({
   if (error || !question) {
     return notFound();
   }
+
+  // Fetch responses for the question
+  const { data: responses, error: responsesError } = await supabase
+    .from("responses")
+    .select("*")
+    .eq("question_id", id)
+    .order("created_at", { ascending: false });
+
+  // Handle responses error gracefully
+  if (responsesError) {
+    console.error("Error fetching responses:", responsesError);
+  }
+
+  // Format created_at date if available
+  const formattedDate = question.created_at
+    ? formatDistanceToNow(new Date(question.created_at), { addSuffix: true })
+    : "Posted recently";
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50/50 to-white">
@@ -71,7 +91,7 @@ export default async function QuestionPage({
                 <User className="h-4 w-4" />
                 <span>{question.username}</span>
                 <span className="text-xs">•</span>
-                <span>Posted recently</span>
+                <span>{formattedDate}</span>
               </div>
 
               <div className="mt-4 pt-4 border-t border-gray-100">
@@ -83,13 +103,17 @@ export default async function QuestionPage({
           </div>
         </div>
 
-        {/* Future: Add answers section here */}
-        <div className="mt-8 text-center p-8 bg-gray-50 rounded-xl border border-gray-100">
-          <h2 className="text-xl font-medium mb-2">Answers coming soon!</h2>
-          <p className="text-muted-foreground">
-            We&apos;re working on adding the ability for students to answer
-            questions.
-          </p>
+        {/* Response Form */}
+        {user && (
+          <ResponseForm
+            questionId={question.id}
+            questionOwnerId={question.user_id || ""}
+          />
+        )}
+
+        {/* Response List */}
+        <div className="mt-12">
+          <ResponseList responses={responses || []} />
         </div>
       </main>
 

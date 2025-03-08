@@ -50,6 +50,7 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     router.refresh(); // Refresh the page to update auth state
+    router.push("/");
   };
 
   return (
@@ -66,7 +67,7 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/home" className="flex items-center gap-2">
             <Compass className="w-6 h-6 text-primary" />
             <h1 className="text-xl font-semibold tracking-tight">MentorMap</h1>
           </Link>
