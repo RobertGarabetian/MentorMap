@@ -214,7 +214,7 @@ const PostsSection: React.FC<PostsSectionProps> = ({ tags, posts }) => {
             >
               <Card
                 onClick={() => {
-                  router.push(`/home/question/${post.id}`);
+                  router.push(`/question/${post.id}`);
                 }}
                 className="overflow-hidden transition-all duration-300 hover:shadow-elevated hover:-translate-y-1 cursor-pointer border-gray-100 bg-white/80 backdrop-blur-sm"
               >

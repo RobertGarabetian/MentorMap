@@ -111,12 +111,12 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
                     </p>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer" asChild>
+                  {/* <DropdownMenuItem className="cursor-pointer" asChild>
                     <Link href="/profile">Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer" asChild>
                     <Link href="/my-questions">My Questions</Link>
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="text-red-500 cursor-pointer flex items-center gap-2"
@@ -132,7 +132,7 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
 
           {!user && (
             <Button asChild>
-              <Link href="/">Sign In</Link>
+              <Link href="/signin">Sign In</Link>
             </Button>
           )}
         </motion.div>

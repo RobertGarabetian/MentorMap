@@ -1,27 +1,66 @@
-import { AuthTabs } from "@/components/auth/AuthTabs";
+import { createClient } from "@/utils/supabase/server";
+import Header from "@/components/Header";
+import PostsSection from "@/components/posts-section";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    // Return landing page for unauthenticated users
+    console.log("not signed in");
+  }
+
+  // Fetch posts and tags for authenticated users
+  const { data: posts, error: postsError } = await supabase
+    .from("questions")
+    .select("id, username, title, question, tag1, tag2, tag3");
+
+  if (postsError) {
+    console.error("Error fetching posts:", postsError);
+    // Handle error gracefully
+    return <div>Error loading questions. Please try again later.</div>;
+  }
+
+  // Fetch tags
+  const { data: tags, error: tagsError } = await supabase
+    .from("tags")
+    .select("id, title");
+
+  if (tagsError) {
+    console.error("Error fetching tags:", tagsError);
+    // Handle error gracefully
+    return <div>Error loading tags. Please try again later.</div>;
+  }
+
   return (
-    <main className="grid grid-cols-1 grid-rows-2 lg:grid-cols-2 lg:grid-rows-1 w-screen min-h-screen">
-      <div className="row-span-1 col-span-1 flex flex-col items-center justify-center">
-        <h2 className="text-4xl relative z-20 md:text-5xl lg:text-7xl font-bold text-center text-black dark:text-white font-sans tracking-tight">
-          <div className="relative mx-auto inline-block w-max [filter:drop-shadow(0px_1px_3px_rgba(27,_37,_80,_0.14))]">
-            <div className="absolute left-0 top-[1px] bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-4 from-purple-500 via-violet-500 to-pink-500 [text-shadow:0_0_rgba(0,0,0,0.1)]">
-              <span className="">MentorMap</span>
-            </div>
-            <div className="relative bg-clip-text text-transparent bg-no-repeat bg-gradient-to-r from-purple-500 via-violet-500 to-pink-500 py-4">
-              <span className="">MentorMap</span>
-            </div>
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50/50 to-white">
+      <Header user={user ? user : null} />
+
+      <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
+        <PostsSection tags={tags || []} posts={posts || []} />
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-100 py-6 bg-white/70 backdrop-blur-sm mt-12">
+        <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
+          <p>© 2023 MentorMap. All rights reserved.</p>
+          <div className="flex gap-4 mt-4 md:mt-0">
+            <a href="#" className="hover:text-gray-900 transition-colors">
+              Terms
+            </a>
+            <a href="#" className="hover:text-gray-900 transition-colors">
+              Privacy
+            </a>
+            <a href="#" className="hover:text-gray-900 transition-colors">
+              Help
+            </a>
           </div>
-        </h2>
-        <p className="text-xs relative z-20 md:text-sm lg:text-xl font-bold text-center">
-          Helping community college students <br />
-          find career and transfer advice
-        </p>
-      </div>
-      <div className="row-span-1 col-span-1 flex flex-col items-center justify-center">
-        <AuthTabs />
-      </div>
-    </main>
+        </div>
+      </footer>
+    </div>
   );
 }

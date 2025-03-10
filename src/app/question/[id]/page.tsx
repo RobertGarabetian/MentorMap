@@ -6,6 +6,7 @@ import { User } from "lucide-react";
 import ResponseForm from "@/components/response-form";
 import ResponseList from "@/components/response-list";
 import { formatDistanceToNow } from "date-fns";
+import { redirect } from "next/navigation";
 
 export default async function QuestionPage({
   params,
@@ -16,10 +17,15 @@ export default async function QuestionPage({
   const supabase = await createClient();
 
   // Get current user
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    // Return landing page for unauthenticated users
+    redirect("/");
+  }
   // Fetch question details
   const { data: question, error } = await supabase
     .from("questions")
